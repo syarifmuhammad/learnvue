@@ -1,6 +1,12 @@
 <html>
   <head>
     <title>Belajar Vue JS</title>
+    <style media="screen">
+      .jb{
+        width: 40px;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
@@ -17,6 +23,7 @@
           <td>Terjual</td>
           <td>Sisa Stock</td>
           <td>Keuntungan</td>
+          <td v-if="jumlah > 1">Action</td>
         </tr>
         <tr v-for="(penjualan,key,index) in penjualan" v-on:keyup.enter="tambah">
           <td>{{key+1}}</td>
@@ -27,9 +34,19 @@
           <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" width="100%" v-bind:max="penjualan.stock" v-model="penjualan.terjual" v-if="penjualan.tampil"><p v-else>{{penjualan.terjual}}</p></td>
           <td>{{penjualan.stock-penjualan.terjual}}</td>
           <td>Rp.{{(penjualan.jual-penjualan.modal)*penjualan.terjual}}</td>
+          <td v-if="jumlah > 1"><button v-on:click="hapus(penjualan)">Hapus</button></td>
         </tr>
       </table>
       <h3 style="color:red;">Jika selesai menginputkan satu barang klik enter untuk menyimpan</h3>
+      <hr />
+      <h1>Terbaru</h1>
+      <p>Harga Modal = Rp {{harga_jual}}</p>
+      <button v-on:click="kBeli()">-</button>
+      <input class="jb" type="number" v-model="jumlah_beli" min="0">
+      <button v-on:click="tBeli()">+</button>
+      <p>Total Harga = Rp {{totalPenjualan()}}</p>
+      <p>Total Keuntungan = Rp {{totalPenjualan()-total}}</p>
+
     </div>
   <script src="vue.js"></script>
   <script>
@@ -37,10 +54,23 @@
       el:'#app',
       data:{
           penjualan:[
-            {nama: null,tampil:false,stock:null,modal:null,jual:null,terjual:null,},
-          ]
+            {nama: null,tampil:true,stock:null,modal:null,jual:null,terjual:null,},
+          ],
+          jumlah_beli:0,
+          harga_jual:1950,
+          mod: 100,
+          total_penjualan:null,
+          total:null
       },
       methods:{
+        totalPenjualan :function(){
+          this.total=this.jumlah_beli*this.harga_jual;
+          if(this.total % this.mod){
+            return this.total_penjualan= (Math.floor(this.total/this.mod)+1)*this.mod;
+          }else{
+            return this.total_penjualan= this.total;
+          }
+        },
         tampilkan: function(index){
           this.penjualan[index].tampil=true
 
@@ -50,6 +80,25 @@
         },
         tambah: function(){
           this.penjualan.push({nama:null,tampil:false,stock:null,modal:null,jual:null,terjual:null,})
+        },
+        tBeli: function(){
+          this.jumlah_beli++;
+        },
+        kBeli:function(){
+          if(this.jumlah_beli >= 1){
+            this.jumlah_beli--;
+          }else{
+            this.jumlah_beli=0;
+          }
+        },
+        hapus:function(penjualan){
+          const index = this.penjualan.indexOf(penjualan);
+          this.penjualan.splice(index,1);
+        }
+      },
+      computed:{
+        jumlah: function (){
+          return this.penjualan.length;
         }
       }
     });
