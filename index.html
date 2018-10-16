@@ -6,9 +6,57 @@
         width: 40px;
         text-align: center;
       }
+      .modal{
+        width: 25%;
+        position: fixed;
+        background-color: #eaeaea;
+        right:0;
+        height: 100vh;
+        top:0;
+        padding: 15px;
+        overflow: scroll;
+      }
+      .modal .button{
+        position: absolute;
+        top: 0;
+        left: -30.89;
+        background-color: rgba(0,0 ,0 , 0.5);
+        border: 1px solid #eaeaea;
+        padding: 4px 10px 4px 10px;
+        transition: transform  1s;
+        color: white;
+      }
+      .modal .button:hover{
+        transform: rotate(360deg);
+      }
+      .modal h1{
+        text-align: center;
+        color: #333;
+      }
+      .barang{
+        width: 20%;
+        float: left;
+      }
+      .barang h3{
+        margin-bottom: 0;
+      }
     </style>
   </head>
   <body>
+    <script type="text/x-template" id="modal-template">
+        <div class="modal">
+          <button class="button" @click="$emit('close')"> X </button>
+          <h1>Keranjang Belanja</h1>
+          <div v-for="(jualan,key,index) in jualan">
+              <div v-if="">
+                <h3>Nama Barang: {{jualan.nama}}</h3>
+                <p>Harga Barang: {{"Rp "+jualan.jual}}</p>
+                <button @click="deleted(key)">delete</button>
+              </div>
+          </div>
+        </div>
+    </script>
+
     <div id="app">
       <h1>
         Hai Selamat Datang
@@ -25,7 +73,7 @@
           <td>Keuntungan</td>
           <td v-if="jumlah > 1">Action</td>
         </tr>
-        <tr v-for="(penjualan,key,index) in penjualan" v-on:keyup.enter="tambah">
+        <tr v-for="(penjualan,key,index) in penjualan" v-on:keyup.enter="tambah(key)">
           <td>{{key+1}}</td>
           <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="text" v-model="penjualan.nama" v-if="penjualan.tampil"><p v-else>{{penjualan.nama}}</p></td>
           <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" v-model="penjualan.stock" v-if="penjualan.tampil"><p v-else>{{penjualan.stock}}</p></td>
@@ -46,40 +94,75 @@
       <button v-on:click="tBeli()">+</button>
       <p>Total Harga = Rp {{totalPenjualan()}}</p>
       <p>Total Keuntungan = Rp {{totalPenjualan()-total}}</p>
+      <h1>Terbaru 2</h1>
+  <!-- use the modal component, pass in the prop -->
+  <modal v-if="showModal" @close="showModal = false" :jualan="transfers">
 
+  </modal>
+
+    <h1>Barang</h1>
+      <div v-for="(penjualan,key,index) in penjualan">
+        <div class="barang" v-if="tampBarang">
+          <h3>Nama Barang: {{penjualan.nama}}</h3>
+          <p>Harga Barang: {{"Rp. "+penjualan.jual}}</p>
+          <button @click="addTroll(key),showModal = true">Tambahkan Kekeranjang</button>
+        </div>
+      </div>
     </div>
   <script src="vue.js"></script>
   <script>
+    Vue.component('modal',{
+      template: "#modal-template",
+      props:{
+        jualan:Array
+      },
+      methods:{
+        deleted:function(index){
+          this.jualan.splice(index,1);
+        }
+      }
+    })
     var vo= new Vue({
       el:'#app',
       data:{
+          tampBarang:false,
+          showModal:false,
+          search:"",
+          nama:["syarif1","syarif2","syarif3"],
           penjualan:[
-            {nama: null,tampil:true,stock:null,modal:null,jual:null,terjual:null,},
+            {id:0,nama: null,tampil:true,stock:0,modal:0,jual:0,terjual:0},
           ],
           jumlah_beli:0,
-          harga_jual:1379,
+          harga_jual:1950,
           mod: 100,
           total_penjualan:null,
-          total:null
+          total:null,
+          transfers:[
+          ],
       },
       methods:{
+        addTroll: function(index){
+              this.transfers.push(this.penjualan[index]);
+        },
         totalPenjualan :function(){
           this.total=this.jumlah_beli*this.harga_jual;
           if(this.total % this.mod){
-            return this.total_penjualan= (Math.floor(this.total/this.mod)+1)*this.mod;
+            // return this.total_penjualan= (Math.floor(this.total/this.mod)+1)*this.mod;
+            return this.total_penjualan= Math.ceil(this.total/this.mod)*this.mod;
           }else{
             return this.total_penjualan= this.total;
           }
         },
         tampilkan: function(index){
-          this.penjualan[index].tampil=true
+          this.penjualan[index].tampil=true;
 
         },
         hilangkan: function(index){
-          this.penjualan[index].tampil= false
+          this.penjualan[index].tampil= false;
+          this.tampBarang= true;
         },
-        tambah: function(){
-          this.penjualan.push({nama:null,tampil:false,stock:null,modal:null,jual:null,terjual:null,})
+        tambah: function(index){
+          this.penjualan.push({id:this.penjualan[index].id+1,nama:null,tampil:false,stock:0,modal:0,jual:0,terjual:0})
         },
         tBeli: function(){
           this.jumlah_beli++;
@@ -99,7 +182,7 @@
       computed:{
         jumlah: function (){
           return this.penjualan.length;
-        }
+        },
       }
     });
   </script>
