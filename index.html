@@ -43,20 +43,6 @@
     </style>
   </head>
   <body>
-    <script type="text/x-template" id="modal-template">
-        <div class="modal">
-          <button class="button" @click="$emit('close')"> X </button>
-          <h1>Keranjang Belanja</h1>
-          <div v-for="(jualan,key,index) in jualan">
-              <div v-if="">
-                <h3>Nama Barang: {{jualan.nama}}</h3>
-                <p>Harga Barang: {{"Rp "+jualan.jual}}</p>
-                <button @click="deleted(key)">delete</button>
-              </div>
-          </div>
-        </div>
-    </script>
-
     <div id="app">
       <h1>
         Hai Selamat Datang
@@ -73,13 +59,13 @@
           <td>Keuntungan</td>
           <td v-if="jumlah > 1">Action</td>
         </tr>
-        <tr v-for="(penjualan,key,index) in penjualan" v-on:keyup.enter="tambah(key)">
+        <tr v-for="(penjualan,key) in penjualan" v-on:keyup.enter="tambah(key)">
           <td>{{key+1}}</td>
           <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="text" v-model="penjualan.nama" v-if="penjualan.tampil"><p v-else>{{penjualan.nama}}</p></td>
-          <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" v-model="penjualan.stock" v-if="penjualan.tampil"><p v-else>{{penjualan.stock}}</p></td>
-          <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" v-model="penjualan.modal" v-if="penjualan.tampil"><p v-else>Rp.{{penjualan.modal}}</p></td>
-          <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" v-model="penjualan.jual" v-if="penjualan.tampil"><p v-else>Rp.{{penjualan.jual}}</p></td>
-          <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" width="100%" v-bind:max="penjualan.stock" v-model="penjualan.terjual" v-if="penjualan.tampil"><p v-else>{{penjualan.terjual}}</p></td>
+          <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" v-model.number="penjualan.stock" v-if="penjualan.tampil"><p v-else>{{penjualan.stock}}</p></td>
+          <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" v-model.number="penjualan.modal" v-if="penjualan.tampil"><p v-else>Rp.{{penjualan.modal}}</p></td>
+          <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" v-model.number="penjualan.jual" v-if="penjualan.tampil"><p v-else>Rp.{{penjualan.jual}}</p></td>
+          <td v-on:click="tampilkan(key)" v-on:keyup.enter="hilangkan(key)"><input type="number" v-bind:min="0" width="100%" v-bind:max="penjualan.stock" v-model.number="penjualan.terjual" v-if="penjualan.tampil"><p v-else>{{penjualan.terjual}}</p></td>
           <td>{{penjualan.stock-penjualan.terjual}}</td>
           <td>Rp.{{(penjualan.jual-penjualan.modal)*penjualan.terjual}}</td>
           <td v-if="jumlah > 1"><button v-on:click="hapus(penjualan)">Hapus</button></td>
@@ -96,32 +82,28 @@
       <p>Total Keuntungan = Rp {{totalPenjualan()-total}}</p>
       <h1>Terbaru 2</h1>
   <!-- use the modal component, pass in the prop -->
-  <modal v-if="showModal" @close="showModal = false" :jualan="transfers">
-
-  </modal>
+    <div class="modal" v-if="showModal">
+      <button class="button" @click="showModal=false"> X </button>
+      <h1>Keranjang Belanja</h1>
+      <div v-for="(jualan,key) in transfers">
+        <h3>Nama Barang: {{jualan.nama}}</h3>
+        <p>Harga Barang: {{"Rp "+jualan.jual}}</p>
+        <button @click="deleted(key,jualan.id)">delete</button>
+      </div>
+    </div>
 
     <h1>Barang</h1>
-      <div v-for="(penjualan,key,index) in penjualan">
+      <div v-for="(penjualan,key) in penjualan">
         <div class="barang" v-if="tampBarang">
           <h3>Nama Barang: {{penjualan.nama}}</h3>
           <p>Harga Barang: {{"Rp. "+penjualan.jual}}</p>
           <button @click="addTroll(key),showModal = true">Tambahkan Kekeranjang</button>
         </div>
       </div>
+      <div ref="myid"></div>
     </div>
   <script src="vue.js"></script>
   <script>
-    Vue.component('modal',{
-      template: "#modal-template",
-      props:{
-        jualan:Array
-      },
-      methods:{
-        deleted:function(index){
-          this.jualan.splice(index,1);
-        }
-      }
-    })
     var vo= new Vue({
       el:'#app',
       data:{
@@ -130,19 +112,26 @@
           search:"",
           nama:["syarif1","syarif2","syarif3"],
           penjualan:[
-            {id:0,nama: null,tampil:true,stock:0,modal:0,jual:0,terjual:0},
+            {id:0,nama: null,tampil:true,stock:0,modal:0,jual:0,terjual:0,register:false},
           ],
           jumlah_beli:0,
           harga_jual:1950,
           mod: 100,
           total_penjualan:null,
           total:null,
-          transfers:[
-          ],
+          transfers:[]
       },
       methods:{
+        deleted:function(index,id){
+          var data=this.penjualan.filter(row => row.id == id)
+          data[0].register=false
+          this.transfers.splice(index,1)
+        },
         addTroll: function(index){
-              this.transfers.push(this.penjualan[index]);
+          if (this.penjualan[index].register==false) {
+            this.penjualan[index].register=true
+            this.transfers.push(this.penjualan[index])
+          }
         },
         totalPenjualan :function(){
           this.total=this.jumlah_beli*this.harga_jual;
@@ -155,14 +144,13 @@
         },
         tampilkan: function(index){
           this.penjualan[index].tampil=true;
-
         },
         hilangkan: function(index){
           this.penjualan[index].tampil= false;
           this.tampBarang= true;
         },
         tambah: function(index){
-          this.penjualan.push({id:this.penjualan[index].id+1,nama:null,tampil:false,stock:0,modal:0,jual:0,terjual:0})
+          this.penjualan.push({id:this.penjualan[index].id+1,nama:null,tampil:false,stock:0,modal:0,jual:0,terjual:0,register:false})
         },
         tBeli: function(){
           this.jumlah_beli++;
