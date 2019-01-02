@@ -1,22 +1,9 @@
 {
-"users":[
-{"id":1,"first_name":"Gillan"},
-{"id":2,"first_name":"Elle"},
-{"id":3,"first_name":"Celinda"},
-{"id":4,"first_name":"Seana"},
-{"id":5,"first_name":"Corney"},
-{"id":6,"first_name":"Jeremy"},
-{"id":7,"first_name":"Fleur"},
-{"id":8,"first_name":"Bealle"},
-{"id":9,"first_name":"Antonia"},
-{"id":10,"first_name":"Stacie"},
-{"id":11,"first_name":"Issy"},
-{"id":12,"first_name":"Angelita"},
-{"id":13,"first_name":"James"},
-{"id":14,"first_name":"Lorena"},
-{"id":15,"first_name":"Anabal"},
-{"id":16,"first_name":"Vin"},
-{"id":17,"first_name":"Claiborn"},
-{"id":18,"first_name":"Cyndy"},
-]
+  "posts": [
+    {
+      "id": 1,
+      "title": "hello"
+    }
+  ]
 }
+
