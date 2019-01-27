@@ -122,9 +122,9 @@
           total:null,
           transfers:[]
       },
-      created:function(){
+      mounted:function(){
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/service-worker.js');
+          navigator.serviceWorker.register();
         }
       },
       methods:{
