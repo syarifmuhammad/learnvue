@@ -122,6 +122,11 @@
           total:null,
           transfers:[]
       },
+      created:function(){
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/service-worker.js');
+        }
+      },
       methods:{
         deleted:function(index,id){
           var data=this.penjualan.filter(row => row.id == id)
