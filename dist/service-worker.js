@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.3b6e6b7238cc54bc3926010f3214628a.js"
+  "/learnvue/dist/precache-manifest.53a720565f821c28a439d38ac25cd339.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "tjadmin"});
